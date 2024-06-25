@@ -40,10 +40,12 @@ impl Font {
         size: u32,
         layout: Option<&LayoutOpts>,
     ) -> Bound<'a, PyArray<u8, Dim<[usize; 2]>>> {
-        self.inner
-            .lock()
-            .rasterize_text(text, size, layout.map(|l| l.to_layout_settings()))
-            .into_pyarray_bound(py)
+        let rarr = py.allow_threads(|| {
+            self.inner
+                .lock()
+                .rasterize_text(text, size, layout.map(|l| l.to_layout_settings()))
+        });
+        rarr.into_pyarray_bound(py)
     }
 }
 
@@ -213,8 +215,10 @@ pub fn rotate<'a>(
 ) -> Bound<'a, PyArray<u8, Dim<[usize; 2]>>> {
     let width = buffer.as_array().shape()[1];
     let linear_buffer = buffer.as_array().to_slice().unwrap();
-    let (width, height, output_buf) =
-        rotsprite(linear_buffer, &transparent, width, rotation).expect("Failed to rotate sprite");
-    let output = Array2::from_shape_vec((height, width), output_buf).unwrap();
+    let output = py.allow_threads(|| {
+        let (width, height, output_buf) = rotsprite(linear_buffer, &transparent, width, rotation)
+            .expect("Failed to rotate sprite");
+        Array2::from_shape_vec((height, width), output_buf).unwrap()
+    });
     output.into_pyarray_bound(py)
 }
