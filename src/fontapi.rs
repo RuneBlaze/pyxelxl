@@ -106,6 +106,10 @@ impl CachedFont {
         }
         array
     }
+
+    pub fn estimate_cached_bytes(&self) -> u64 {
+        self.cache.weighted_size()
+    }
 }
 
 #[derive(Clone)]

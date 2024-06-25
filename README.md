@@ -101,7 +101,7 @@ blt(80 - 32, 60 - 32, self.square, 0, 0, 64, 64, colkey=0, rot=self.angle)
 
 ## Advantages
 
- - Fast
+ - Fast for font rendering
  - Easy multi-font size support
  - Anti-aliasing algorithm for non-pixel fonts
 

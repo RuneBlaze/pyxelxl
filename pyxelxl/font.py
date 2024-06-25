@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections import Counter
 from functools import lru_cache, partial
 from typing import List, Optional, Protocol, Union
@@ -37,10 +39,12 @@ def _five_point_consensus(arr: np.ndarray) -> Optional[int]:
     )
     return counts.most_common(1)[0][0]
 
+
 class DrawTextLike(Protocol):
     """
     A function like `pyxel.text`, but with layout options enabled.
     """
+
     def __call__(
         self,
         x: int,
@@ -51,6 +55,7 @@ class DrawTextLike(Protocol):
         /,
     ) -> None:
         ...
+
 
 class Font:
     """
@@ -177,3 +182,35 @@ class Font:
 
         """
         return partial(self.text, font_size=font_size, threshold=threshold)
+
+    def estimate_cached_bytes(self) -> Optional[int]:
+        """
+        Estimates the number of bytes used for caching font glyphs.
+
+        Returns:
+            int | None: The number of bytes used for caching font glyphs, or None if the estimate is not available.
+        """
+        return self.inner.estimate_cached_bytes()
+
+    @property
+    def name(self) -> Optional[str]:
+        """
+        Returns the name of the font, if available.
+
+        Returns:
+            Optional[str]: The name of the font.
+        """
+        return self.inner.name
+
+    @property
+    def max_cached_bytes(self) -> int:
+        """
+        Returns the maximum number of bytes used for caching font glyphs.
+
+        Returns:
+            int: The maximum number of bytes used for caching font glyphs.
+        """
+        return self.inner.capacity
+
+    def __str__(self) -> str:
+        return f"Font({self.name})"

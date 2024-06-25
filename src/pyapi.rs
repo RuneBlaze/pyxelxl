@@ -47,6 +47,26 @@ impl Font {
         });
         rarr.into_pyarray_bound(py)
     }
+
+    #[getter]
+    pub fn name(&self) -> Option<String> {
+        self.inner.lock().font.name().map(|s| s.to_string())
+    }
+
+    #[getter]
+    pub fn capacity(&self) -> PyResult<u64> {
+        Ok(self
+            .inner
+            .lock()
+            .cache
+            .policy()
+            .max_capacity()
+            .context("Cache is not bounded, not expected")?)
+    }
+
+    pub fn estimate_cached_bytes(&self) -> u64 {
+        self.inner.lock().estimate_cached_bytes()
+    }
 }
 
 #[pyclass]
