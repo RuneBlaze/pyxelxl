@@ -1,58 +1,34 @@
-from pyxelxl import Font, FontDrawer
-from PIL import Image
 import pyxel
-import numpy as np
 
-with open('/Users/lbq/Downloads/Roboto/Roboto-Regular.ttf', 'rb') as fh:
-    font = Font(fh.read())
+from pyxelxl.font import Font
 
-rasterized = font.rasterize_text('Hello, World!', 14)
-# print(rasterized.shape)
+font = Font("/Users/lbq/goof/genio/assets/DMSerifDisplay-Regular.ttf")
+font2 = Font("/Users/lbq/goof/genio/assets/retro-pixel-petty-5h.ttf")
+zh = Font("/Users/lbq/Downloads/zpix.ttf")
 
-
-# Create boolean masks for each grade
-grade1_mask = (rasterized < 2*255//4) & (rasterized >= 255//4)
-grade2_mask = (rasterized < 3*255//4) & (rasterized >= 2*255//4)
-grade3_mask = (rasterized >= 3*255//4)
-
-def image_as_ndarray(image: pyxel.Image) -> np.ndarray:
-    data_ptr = image.data_ptr()
-    h, w = image.height, image.width
-    return np.frombuffer(data_ptr, dtype=np.uint8).reshape(h, w)
 
 class App:
     def __init__(self):
-        pyxel.init(160, 120)
-        self.drawer = FontDrawer(pyxel.colors.to_list())
+        pyxel.init(320, 240)
+        self.cam_x = 0
+        self.cam_y = 0
         pyxel.run(self.update, self.draw)
 
     def update(self):
         pass
+        self.cam_x = (self.cam_x + 1) % 320
+        self.cam_y = (self.cam_y + 1) % 240
+        pyxel.camera(self.cam_x - 100, self.cam_y - 100)
 
     def draw(self):
-        pyxel.cls(0)
-        arr = image_as_ndarray(pyxel.screen)
-        self.drawer.imprint(rasterized, 7, 10, 10, arr)
-        # grade = rasterized > 255//2
-        # h, w = rasterized.shape
-        # for i in range(h):
-        #     for j in range(w):
-        #         if grade[i, j] > 0:
-        #             pyxel.pset(j, i, 7)
+        pyxel.cls(9)
+        img = font.rasterize("Hello, World!", 20, 255//2, 7, 0)
+        pyxel.blt(0, 0, img, 0, 0, img.width, img.height, 0)
+        font2.draw(0, 20, "Hello, World!", 7, font_size=5)
+        zh.draw(
+            0, 40, "我能吞下玻璃而不伤身体\n我能吞下玻璃而不伤身体", 7, font_size=12
+        )
+        pyxel.text(0, 70, "Hello, World!", 7)
+
 
 App()
-# rasterized[rasterized < 255//4] = 0
-# rasterized[(rasterized < 2*255//4) & (rasterized >= 255//4)] = 85
-# rasterized[(rasterized < 3*255//4) & (rasterized >= 2*255//4)] = 170
-# rasterized[3*255//4 <= rasterized] = 255
-# image = Image.fromarray(rasterized)
-
-# # Save the image
-# image.save('output_image.png')
-# # zoom in
-
-# # Resize the image
-# image = image.resize((image.width * 10, image.height * 10), resample=Image.NEAREST)
-
-# # Optionally, show the image
-# image.show()

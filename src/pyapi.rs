@@ -59,20 +59,36 @@ impl FontDrawer {
             })
             .collect();
         Self {
-            palette: Palette { palette: colors },
+            palette: Palette::from_colors(colors),
         }
     }
 
-    pub fn imprint<'py>(
+    pub fn set_allow(&mut self, allows: Vec<usize>) {
+        let mut allow = vec![false; self.palette.colors.len()];
+        for i in allows {
+            allow[i as usize] = true;
+        }
+        self.palette.allow = allow;
+    }
+
+    pub fn reset_allow(&mut self) {
+        self.palette.allow = vec![true; self.palette.colors.len()];
+    }
+
+    pub fn imprint(
         &self,
         rasterized: PyReadonlyArray2<u8>,
         text_color: u8,
         u: u32,
         v: u32,
-        target: &Bound<'py, PyArray2<u8>>,
+        target: &Bound<'_, PyArray2<u8>>,
     ) {
         let rasterized = rasterized.as_array().to_owned();
         let target = unsafe { target.as_array_mut() };
         imprint_text(&self.palette, rasterized, text_color, u, v, target);
+    }
+
+    pub fn __len__(&self) -> usize {
+        self.palette.colors.len()
     }
 }
