@@ -2,7 +2,7 @@
 
 > I am using this for my own game dev purposes, and this is beta-quality software.
 
-Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for antialiasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
+Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for layout (align, wrapping) and experimental support for anti-aliasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
 
 ![alt screenshot](demo/bare_screenshot.png)
 
