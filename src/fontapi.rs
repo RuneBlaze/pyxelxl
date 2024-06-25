@@ -1,9 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::Arc};
 
 use fontdue::{
     layout::{GlyphPosition, Layout, TextStyle},
     Font,
 };
+use mini_moka::sync::Cache;
 use numpy::ndarray::{Array2, ArrayView2, ArrayViewMut2};
 use palette::{
     blend::{BlendWith, PreAlpha},
@@ -14,35 +15,44 @@ use pyo3::prelude::*;
 
 pub struct CachedFont {
     pub(crate) font: fontdue::Font,
-    pub(crate) cache: HashMap<(char, u32), Array2<u8>>,
+    pub(crate) cache: Cache<(char, u32), Arc<Array2<u8>>>,
 }
 
 impl CachedFont {
-    pub fn new(font: fontdue::Font) -> Self {
-        Self {
-            font,
-            cache: HashMap::new(),
-        }
+    pub fn new(font: fontdue::Font, max_size: u64) -> Self {
+        let cache: Cache<(char, u32), Arc<Array2<u8>>> = Cache::builder()
+            .max_capacity(max_size)
+            .weigher(|_, v: &Arc<Array2<u8>>| -> u32 { v.len() as u32 })
+            .build();
+        Self { font, cache: cache }
     }
 
-    pub fn try_from_bytes(bytes: &[u8], settings: fontdue::FontSettings) -> anyhow::Result<Self> {
+    pub fn try_from_bytes(
+        bytes: &[u8],
+        settings: fontdue::FontSettings,
+        max_size: u64,
+    ) -> anyhow::Result<Self> {
         let font = Font::from_bytes(bytes, settings).map_err(|e| anyhow::anyhow!(e))?;
-        Ok(Self::new(font))
+        Ok(Self::new(font, max_size))
     }
 
-    pub fn rasterize(&mut self, ch: char, size: u32) -> ArrayView2<u8> {
-        let entry = self.cache.entry((ch, size));
-        let entry = entry.or_insert_with(|| {
-            let (metrics, bitmap) = self.font.rasterize(ch, size as f32);
-            let mut array = Array2::<u8>::zeros((metrics.height as usize, metrics.width as usize));
-            for y in 0..metrics.height as usize {
-                for x in 0..metrics.width as usize {
-                    array[[y, x]] = bitmap[y * metrics.width as usize + x];
+    pub fn rasterize(&mut self, ch: char, size: u32) -> Arc<Array2<u8>> {
+        match self.cache.get(&(ch, size)) {
+            Some(entry) => entry,
+            None => {
+                let (metrics, bitmap) = self.font.rasterize(ch, size as f32);
+                let mut array =
+                    Array2::<u8>::zeros((metrics.height as usize, metrics.width as usize));
+                for y in 0..metrics.height as usize {
+                    for x in 0..metrics.width as usize {
+                        array[[y, x]] = bitmap[y * metrics.width as usize + x];
+                    }
                 }
+                let a = Arc::new(array);
+                self.cache.insert((ch, size), a.clone());
+                a
             }
-            array
-        });
-        entry.view()
+        }
     }
 
     pub fn rasterize_without_cache(&self, ch: char, size: u32) -> Array2<u8> {

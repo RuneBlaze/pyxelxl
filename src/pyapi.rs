@@ -1,12 +1,9 @@
-use std::sync::Arc;
-
 use fontdue::FontSettings;
-use numpy::{
-    ndarray::Dim, IntoPyArray, PyArray, PyArray2, PyArrayDyn, PyArrayMethods, PyReadonlyArray2,
-};
+use numpy::{ndarray::Dim, IntoPyArray, PyArray, PyArray2, PyArrayMethods, PyReadonlyArray2};
 use palette::rgb::Rgb;
 use parking_lot::Mutex;
 use pyo3::prelude::*;
+use std::sync::Arc;
 
 use crate::fontapi::{imprint_text, CachedFont, Palette};
 
@@ -18,9 +15,13 @@ pub struct Font {
 #[pymethods]
 impl Font {
     #[new]
-    pub fn new(bytes: &[u8]) -> PyResult<Self> {
-        let font = CachedFont::try_from_bytes(bytes, FontSettings::default())
-            .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
+    pub fn new(bytes: &[u8], capacity: Option<u64>) -> PyResult<Self> {
+        let font = CachedFont::try_from_bytes(
+            bytes,
+            FontSettings::default(),
+            capacity.unwrap_or(32 * 1024 * 1024),
+        )
+        .map_err(|e| PyErr::new::<pyo3::exceptions::PyValueError, _>(e.to_string()))?;
         Ok(Self {
             inner: Arc::new(Mutex::new(font)),
         })
