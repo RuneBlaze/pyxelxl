@@ -1,6 +1,8 @@
 # PyxelXL
 
-Fast TTF drawing for Pyxel, including support for antialiasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
+Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for antialiasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
+
+![alt screenshot](demo/bare_screenshot.png)
 
 ## Installation
 
@@ -41,5 +43,5 @@ App()
 ## Advantages
 
  - Fast
- - Multi-font size support
+ - Easy multi-font size support
  - Anti-aliasing algorithm for non-pixel fonts
