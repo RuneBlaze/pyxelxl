@@ -1,9 +1,13 @@
 use anyhow::Context;
 use fontdue::FontSettings;
-use numpy::{ndarray::Dim, IntoPyArray, PyArray, PyArray2, PyArrayMethods, PyReadonlyArray2};
-use palette::rgb::Rgb;
+use numpy::{
+    ndarray::{Array2, Dim},
+    IntoPyArray, PyArray, PyArray2, PyArrayMethods, PyReadonlyArray2,
+};
+use palette::{encoding::linear, rgb::Rgb};
 use parking_lot::Mutex;
 use pyo3::prelude::*;
+use rotsprite::rotsprite;
 use std::sync::Arc;
 use strum_macros::{Display, EnumString};
 
@@ -198,4 +202,19 @@ impl LayoutOpts {
         }
         settings
     }
+}
+
+#[pyfunction]
+pub fn rotate<'a>(
+    py: Python<'a>,
+    buffer: PyReadonlyArray2<u8>,
+    transparent: u8,
+    rotation: f64,
+) -> Bound<'a, PyArray<u8, Dim<[usize; 2]>>> {
+    let width = buffer.as_array().shape()[1];
+    let linear_buffer = buffer.as_array().to_slice().unwrap();
+    let (width, height, output_buf) =
+        rotsprite(linear_buffer, &transparent, width, rotation).expect("Failed to rotate sprite");
+    let output = Array2::from_shape_vec((height, width), output_buf).unwrap();
+    output.into_pyarray_bound(py)
 }

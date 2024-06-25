@@ -4,7 +4,7 @@
 
 Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for layout (align, wrapping) and experimental support for anti-aliasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
 
-![alt screenshot](demo/bare_screenshot.png)
+![alt screenshot](demo/pyxel-20240625-031732.gif)
 
 ## Installation
 
@@ -87,6 +87,14 @@ App()
 
 - `line_height_mult`: `Optional[float]`
   - The multiplier for line height. If `None`, the line height is determined by the font size.
+
+## Center Rotation
+
+```python
+from pyxelxl.rotate import blt
+blt(80 - 32, 60 - 32, self.square, 0, 0, 64, 64, colkey=0, rot=self.angle)
+# The rotation center is at (80, 60) in the global coordinate system.
+```
 
 ## Advantages
 
