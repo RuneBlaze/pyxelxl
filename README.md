@@ -93,3 +93,8 @@ App()
  - Fast
  - Easy multi-font size support
  - Anti-aliasing algorithm for non-pixel fonts
+
+## Acknowledgements
+
+Heavy-lifting done by [fontdue](https://github.com/mooman219/fontdue), and obviously this library will not
+be here if not for Pyxel.
