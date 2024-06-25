@@ -1,11 +1,12 @@
-import pyxel
-from pyxelxl.font import Font
-from pyxelxl.rotate import blt
-from pyxelxl import LayoutOpts
 import math
 
+import pyxel
+
+from pyxelxl import Font, LayoutOpts
+from pyxelxl import blt_rot as blt
 
 zh_font = Font("/Users/lbq/Downloads/zpix.ttf")
+zh_font_text = zh_font.specialize(font_size=12)
 
 
 class App:
@@ -27,12 +28,11 @@ class App:
 
     def draw(self):
         pyxel.cls(1)
-        zh_font.text(
+        zh_font_text(
             0,
             40,
             "我能吞下玻璃而伤身体 " * 5,
             7,
-            font_size=12,
             layout=LayoutOpts(max_width=160, horizontal_align="center"),
         )
         blt(80 - 32, 60 - 32, self.square, 0, 0, 64, 64, colkey=0, rot=self.angle)

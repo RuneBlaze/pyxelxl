@@ -1,13 +1,12 @@
 from collections import Counter
 from functools import lru_cache, partial
-from typing import List, Optional, Union, Callable
+from typing import List, Optional, Protocol, Union
 
 import numpy as np
 import pyxel
 
 from pyxelxl.pyxelxl import Font as _Font
-from pyxelxl.pyxelxl import FontDrawer
-from pyxelxl.pyxelxl import LayoutOpts
+from pyxelxl.pyxelxl import FontDrawer, LayoutOpts
 
 
 @lru_cache
@@ -38,8 +37,39 @@ def _five_point_consensus(arr: np.ndarray) -> Optional[int]:
     )
     return counts.most_common(1)[0][0]
 
+class DrawTextLike(Protocol):
+    """
+    A function like `pyxel.text`, but with layout options enabled.
+    """
+    def __call__(
+        self,
+        x: int,
+        y: int,
+        s: str,
+        col: int,
+        layout: Optional[LayoutOpts] = ...,
+        /,
+    ) -> None:
+        ...
 
 class Font:
+    """
+    TrueType font rendering for Pyxel. This class wraps a .ttf font file and provides
+    methods for rendering text onto the Pyxel screen.
+
+    Example:
+    ```python
+    import pyxel
+    from pyxelxl import Font, LayoutOpts
+    # After Pyxel is initialized
+    # .. init
+    font = Font("/path/to/font.ttf")
+    font_text = font.specialize(font_size=12, threshold=100)
+    # .. draw
+    font_text(0, 0, "Hello, World!", 7)
+    ```
+    """
+
     def __init__(
         self, path_like: Union[str, bytes], max_cached_bytes: int = 32 * 1024 * 1024
     ):
@@ -70,13 +100,15 @@ class Font:
         """
         Draws text onto the Pyxel screen at the specified location.
 
-        :param x: X-coordinate of the text's position.
-        :param y: Y-coordinate of the text's position.
-        :param s: Text to draw.
-        :param col: Primary color index.
-        :param font_size: Size of the font.
-        :param dithering_cols: Optional list of color indices used for dithering.
-        :param threshold: Optional threshold for binary image conversion, ranges in [0, 255].
+        Args:
+            x (int): The x-coordinate of the text.
+            y (int): The y-coordinate of the text.
+            s (str): The text to draw.
+            col (int): The color of the text.
+            font_size (int): The size of the font.
+            dithering_cols (Optional[List[int]]): A list of palette colors to use for dithering.
+            threshold (Optional[int]): The threshold for dithering, ranges in 0-255.
+            layout (Optional[LayoutOpts]): The layout options for the text.
         """
         rasterized = self._rasterize(s, font_size, layout=layout)
         drawer = _state()
@@ -130,5 +162,18 @@ class Font:
         arr[:] = np.where(rasterized > threshold, fg_col, bg_col)
         return image
 
-    def specialize(self, font_size: int, threshold: int = None) -> Callable:
+    def specialize(self, font_size: int, threshold: int = None) -> DrawTextLike:
+        """
+        Creates a `pyxel.text`-like function by creating a partial function with the specified font size and threshold.
+
+        Args:
+            font_size (int): The size of the font.
+            threshold (int, optional): The threshold value for the specialized font to discretize the font.
+                If set, disables antialiasing and defaults to None.
+
+        Returns:
+            DrawTextLike: A partial function that can be used to draw text with the specialized font.
+                This function has the same call signature as `pyxel.text`, but enables layout options.
+
+        """
         return partial(self.text, font_size=font_size, threshold=threshold)

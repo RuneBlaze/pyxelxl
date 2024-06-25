@@ -1,6 +1,7 @@
 import pyxel
+
 from pyxelxl.font import Font
-from pyxelxl import LayoutOpts
+from pyxelxl.pyxelxl import LayoutOpts
 
 roboto = Font("/Users/lbq/Downloads/Roboto/Roboto-Regular.ttf")
 zh_font = Font("/Users/lbq/Downloads/zpix.ttf")

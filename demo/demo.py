@@ -1,7 +1,7 @@
 import pyxel
 
 from pyxelxl.font import Font
-from pyxelxl import LayoutOpts
+from pyxelxl.pyxelxl import LayoutOpts
 
 font = Font("/Users/lbq/goof/genio/assets/DMSerifDisplay-Regular.ttf")
 font2 = Font("/Users/lbq/goof/genio/assets/retro-pixel-petty-5h.ttf")

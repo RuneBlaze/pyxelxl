@@ -1,9 +1,10 @@
-from pyxelxl.pyxelxl import rotate
+import math
+from typing import Optional, Union
+
 from pyxel import Image
 from pyxel import blt as _blt
 
-from typing import Union, Optional
-import math
+from pyxelxl.pyxelxl import rotate
 
 from .font import _image_as_ndarray
 
@@ -54,5 +55,7 @@ def blt(
     colkey: int,
     rot: float = 0.0,
 ) -> None:
+    if rot == 0.0:
+        return _blt(x, y, img, u, v, w, h, colkey=colkey)
     nx, ny = x + w // 2, y + h // 2
     return blt_centered(nx, ny, img, u, v, w, h, colkey, rot)
