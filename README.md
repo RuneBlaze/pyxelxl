@@ -1,5 +1,7 @@
 # PyxelXL
 
+> I am using this for my own game dev purposes, and this is beta-quality software.
+
 Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for antialiasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
 
 ![alt screenshot](demo/bare_screenshot.png)
@@ -35,7 +37,7 @@ class App:
         pyxel.cls(1)
         roboto.draw(0, 0, "Hello, World! Antialiased", 7, font_size=16) # Roboto is not a pixel font...
         zh_font.draw(0, 40, "我能吞下玻璃而不伤身体", 7, font_size=12) # This is a pixel font so will look pixel-perfect
-        roboto.draw(0, 80, "Hello, World! Not antialiased", 15, font_size=16, threshold=128)
+        roboto.draw(0, 80, "Hello, World! Not antialiased", 15, font_size=16, threshold=128) # The "safe" way to draw non-pixel fonts
 
 App()
 ```
