@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use fontdue::{
-    layout::{GlyphPosition, Layout, TextStyle},
+    layout::{GlyphPosition, Layout, LayoutSettings, TextStyle},
     Font,
 };
 use mini_moka::sync::Cache;
@@ -64,9 +64,17 @@ impl CachedFont {
         array
     }
 
-    pub fn rasterize_text(&mut self, text: &str, size: u32) -> Array2<u8> {
+    pub fn rasterize_text(
+        &mut self,
+        text: &str,
+        size: u32,
+        opts: Option<LayoutSettings>,
+    ) -> Array2<u8> {
         // do layout
         let mut layout = Layout::new(fontdue::layout::CoordinateSystem::PositiveYDown);
+        if let Some(opts) = opts {
+            layout.reset(&opts);
+        }
         layout.append(
             std::slice::from_ref(&self.font),
             &TextStyle::new(text, size as f32, 0),

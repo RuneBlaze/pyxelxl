@@ -1,6 +1,7 @@
 import pyxel
 
 from pyxelxl.font import Font
+from pyxelxl import LayoutOpts
 
 font = Font("/Users/lbq/goof/genio/assets/DMSerifDisplay-Regular.ttf")
 font2 = Font("/Users/lbq/goof/genio/assets/retro-pixel-petty-5h.ttf")
@@ -22,10 +23,10 @@ class App:
 
     def draw(self):
         pyxel.cls(9)
-        img = font.rasterize("Hello, World!", 20, 255//2, 7, 0)
+        img = font.rasterize("Hello, World!", 20, 255 // 2, 7, 0)
         pyxel.blt(0, 0, img, 0, 0, img.width, img.height, 0)
-        font2.draw(0, 20, "Hello, World!", 7, font_size=5)
-        zh.draw(
+        font2.text(0, 20, "Hello, World!", 7, font_size=5)
+        zh.text(
             0, 40, "我能吞下玻璃而不伤身体\n我能吞下玻璃而不伤身体", 7, font_size=12
         )
         pyxel.text(0, 70, "Hello, World!", 7)

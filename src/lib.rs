@@ -7,5 +7,6 @@ use pyo3::prelude::*;
 fn pyxelxl(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<pyapi::Font>()?;
     m.add_class::<pyapi::FontDrawer>()?;
+    m.add_class::<pyapi::LayoutOpts>()?;
     Ok(())
 }

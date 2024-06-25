@@ -1,12 +1,13 @@
 from collections import Counter
-from functools import lru_cache
-from typing import List, Optional, Union
+from functools import lru_cache, partial
+from typing import List, Optional, Union, Callable
 
 import numpy as np
 import pyxel
 
 from pyxelxl.pyxelxl import Font as _Font
 from pyxelxl.pyxelxl import FontDrawer
+from pyxelxl.pyxelxl import LayoutOpts
 
 
 @lru_cache
@@ -20,10 +21,12 @@ def _image_as_ndarray(image: pyxel.Image) -> np.ndarray:
     return np.frombuffer(data_ptr, dtype=np.uint8).reshape(h, w)
 
 
-def _five_point_consensus(arr: np.ndarray) -> np.ndarray:
+def _five_point_consensus(arr: np.ndarray) -> Optional[int]:
     # Given two dimensional array, sample four corners and center of the image, and return the mode
     # of the five points.
     h, w = arr.shape
+    if h < 2 or w < 2:
+        return None
     counts = Counter(
         [
             arr[0, 0],
@@ -42,7 +45,7 @@ class Font:
     ):
         """
         Initializes a new Font object with a path to a TTF font or font data.
-        
+
         :param path_like: Path to the font file or bytes object containing font data.
         :param max_cached_bytes: Maximum number of bytes used for caching font data.
         """
@@ -53,33 +56,34 @@ class Font:
             buf = path_like
         self.inner = _Font(buf, max_cached_bytes)
 
-    def draw(
+    def text(
         self,
         x: int,
         y: int,
-        text: str,
-        primary_col: int,
+        s: str,
+        col: int,
         font_size: int,
         dithering_cols: Optional[List[int]] = None,
         threshold: Optional[int] = None,
+        layout: Optional[LayoutOpts] = None,
     ):
         """
         Draws text onto the Pyxel screen at the specified location.
-        
+
         :param x: X-coordinate of the text's position.
         :param y: Y-coordinate of the text's position.
-        :param text: Text to draw.
-        :param primary_col: Primary color index.
+        :param s: Text to draw.
+        :param col: Primary color index.
         :param font_size: Size of the font.
         :param dithering_cols: Optional list of color indices used for dithering.
         :param threshold: Optional threshold for binary image conversion, ranges in [0, 255].
         """
-        rasterized = self._rasterize(text, font_size)
+        rasterized = self._rasterize(s, font_size, layout=layout)
         drawer = _state()
         if dithering_cols is None:
             dithering_cols = [0, 7, 13]
-        if primary_col not in dithering_cols:
-            dithering_cols.append(primary_col)
+        if col not in dithering_cols:
+            dithering_cols.append(col)
         reserved = next(iter(set(range(len(drawer))) - set(dithering_cols)))
         temporary_buffer = pyxel.Image(*rasterized.shape[::-1])
         temp_buffer_arr = _image_as_ndarray(temporary_buffer)
@@ -90,28 +94,41 @@ class Font:
         if threshold is None:
             if len(dithering_cols) < len(drawer) - 1:
                 consensus = _five_point_consensus(temp_buffer_arr)
-                if consensus not in dithering_cols:
+                if consensus is not None and consensus not in dithering_cols:
                     dithering_cols.append(consensus)
             if len(dithering_cols) >= len(drawer):
                 raise ValueError(
                     "Too many dithering colors; need to reserve one for transparency."
                 )
             drawer.set_allow(dithering_cols)
-            drawer.imprint(rasterized, primary_col, 0, 0, temp_buffer_arr)
+            drawer.imprint(rasterized, col, 0, 0, temp_buffer_arr)
             temp_buffer_arr[~np.isin(temp_buffer_arr, dithering_cols)] = reserved
         else:
-            temp_buffer_arr[rasterized > threshold] = primary_col
+            temp_buffer_arr[rasterized > threshold] = col
         pyxel.blt(
             x, y, temporary_buffer, 0, 0, *rasterized.shape[::-1], colkey=reserved
         )
 
-    def _rasterize(self, text: str, font_size: int) -> np.ndarray:
-        return self.inner.rasterize_text(text, font_size)
+    def _rasterize(
+        self, text: str, font_size: int, layout: Optional[LayoutOpts] = None
+    ) -> np.ndarray:
+        return self.inner.rasterize_text(text, font_size, layout)
 
-    def rasterize(self, text: str, font_size: int, threshold: int, fg_col: int, bg_col: int) -> pyxel.Image:
-        rasterized = self._rasterize(text, font_size)
+    def rasterize(
+        self,
+        text: str,
+        font_size: int,
+        threshold: int,
+        fg_col: int,
+        bg_col: int,
+        layout: Optional[LayoutOpts] = None,
+    ) -> pyxel.Image:
+        rasterized = self._rasterize(text, font_size, layout)
         w, h = rasterized.shape[::-1]
         image = pyxel.Image(w, h)
         arr = _image_as_ndarray(image)
         arr[:] = np.where(rasterized > threshold, fg_col, bg_col)
         return image
+
+    def specialize(self, font_size: int, threshold: int = None) -> Callable:
+        return partial(self.text, font_size=font_size, threshold=threshold)
