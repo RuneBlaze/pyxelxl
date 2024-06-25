@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "pyxelxl"
-description = "Bitmap fonts, and in the future more for Pyxel."
+description = "Truetype fonts, sprite rotation, and in the future more extensions for Pyxel."
 authors = [
     {name = "RuneBlaze", email = "runeblaze@protonmail.com"}
 ]
