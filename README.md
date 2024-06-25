@@ -2,7 +2,10 @@
 
 > I am using this for my own game dev purposes, and this is beta-quality software.
 
-Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for layout (align, wrapping) and experimental support for anti-aliasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension.
+
+"Bloat"-ish extensions for Pyxel, that might not fit the retro game-dev aesthetic, but fits more for the "let's throw up some constraints for our game jam so we can focus" aesthetic.
+
+Fast TTF drawing for [Pyxel](https://github.com/kitao/pyxel), including support for layout (align, wrapping) and experimental support for anti-aliasing. This library is in the works to become a general purpose "bloated" set of extensions for Pyxel, but for now it only includes a font rendering extension and a center-rotation extension.
 
 ![alt screenshot](demo/pyxel-20240625-031732.gif)
 
