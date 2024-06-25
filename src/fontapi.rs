@@ -1,14 +1,14 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{sync::Arc};
 
 use fontdue::{
     layout::{GlyphPosition, Layout, TextStyle},
     Font,
 };
 use mini_moka::sync::Cache;
-use numpy::ndarray::{Array2, ArrayView2, ArrayViewMut2};
+use numpy::ndarray::{Array2, ArrayViewMut2};
 use palette::{
     blend::{BlendWith, PreAlpha},
-    rgb::{Rgb, Rgba},
+    rgb::{Rgb},
     WithAlpha,
 };
 use pyo3::prelude::*;
