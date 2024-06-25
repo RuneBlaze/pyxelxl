@@ -147,6 +147,7 @@ pub struct LayoutOpts {
     pub horizontal_align: HorzAlign,
     pub vertical_align: VertAlign,
     pub line_height_mult: Option<f32>,
+    pub can_break_words: Option<bool>,
 }
 
 #[pymethods]
@@ -158,6 +159,7 @@ impl LayoutOpts {
         horizontal_align: Option<&str>,
         vertical_align: Option<&str>,
         line_height_mult: Option<f32>,
+        can_break_words: Option<bool>,
     ) -> PyResult<Self> {
         let h = horizontal_align
             .map(|s| s.parse())
@@ -185,17 +187,19 @@ impl LayoutOpts {
             horizontal_align: h,
             vertical_align: v,
             line_height_mult,
+            can_break_words,
         })
     }
 
     fn __repr__(&self) -> String {
         format!(
-            "LayoutOpts(max_width={}, max_height={}, horizontal_align={}, vertical_align={}, line_height_mult={})",
+            "LayoutOpts(max_width={}, max_height={}, horizontal_align={}, vertical_align={}, line_height_mult={}, can_break_words={})",
             self.max_width.as_ref().map(|v| v.to_string()).unwrap_or("None".to_string()),
             self.max_height.as_ref().map(|v| v.to_string()).unwrap_or("None".to_string()),
             self.horizontal_align.to_string(),
             self.vertical_align.to_string(),
             self.line_height_mult.as_ref().map(|v| v.to_string()).unwrap_or("None".to_string()),
+            self.can_break_words.as_ref().map(|v| v.to_string()).unwrap_or("None".to_string()),
         )
     }
 
@@ -221,6 +225,9 @@ impl LayoutOpts {
         };
         if let Some(line_height_mult) = self.line_height_mult {
             settings.line_height = line_height_mult;
+        }
+        if let Some(true) = self.can_break_words {
+            settings.wrap_style = fontdue::layout::WrapStyle::Letter
         }
         settings
     }

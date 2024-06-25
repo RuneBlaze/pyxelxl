@@ -10,6 +10,7 @@ def layout(
     ha: Literal["left", "center", "right"] = "left",
     va: Literal["top", "center", "bottom"] = "top",
     line_height: Optional[float] = None,
+    break_words: Optional[bool] = None,
 ) -> LayoutOpts:
     """
     Create a layout with specified options.
@@ -20,6 +21,8 @@ def layout(
         ha (Literal["left", "center", "right"]): The horizontal alignment of the layout. Defaults to "left".
         va (Literal["top", "center", "bottom"]): The vertical alignment of the layout. Defaults to "top".
         line_height (Optional[float]): The line height multiplier of the layout. Defaults to None.
+        break_words (Optional[bool]): Whether words can be broken in the layout.
+            Defaults to None (not breaking words).
 
     Returns:
         LayoutOpts: The layout options object.
@@ -30,7 +33,8 @@ def layout(
         max_height=h,
         horizontal_align=ha,
         vertical_align=va,
-        line_height_mult=line_height
+        line_height_mult=line_height,
+        can_break_words=break_words,
     )
 
 __all__ = ["Font", "LayoutOpts", "blt_rot", "layout"]
