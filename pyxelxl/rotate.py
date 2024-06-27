@@ -17,12 +17,14 @@ def blt_centered(
     v: int,
     w: int,
     h: int,
-    colkey: int,
+    colkey: Optional[int] = None,
     rot: float = 0.0,
 ) -> None:
     # Create a buffer image and copy the relevant part of the original image to it
     buffer = Image(w, h)
     buffer.blt(0, 0, img, u, v, w, h)
+    if colkey is None:
+        colkey = 255
 
     # Convert the buffer image to an ndarray and apply rotation
     buffer_arr = _image_as_ndarray(buffer)
@@ -52,7 +54,7 @@ def blt(
     v: int,
     w: int,
     h: int,
-    colkey: int,
+    colkey: Optional[int] = None,
     rot: float = 0.0,
 ) -> None:
     if rot == 0.0:

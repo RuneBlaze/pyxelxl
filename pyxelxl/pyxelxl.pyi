@@ -11,7 +11,7 @@ class LayoutOpts:
         horizontal_align (Literal["left", "center", "right"]): The horizontal alignment of the layout.
         vertical_align (Literal["top", "center", "bottom"]): The vertical alignment of the layout.
         line_height_mult (Optional[float]): The line height multiplier of the layout.
-        can_break_words (Optional[bool]): Whether words can be broken in the layout, default to 
+        can_break_words (Optional[bool]): Whether words can be broken in the layout, default to
     """
     def __init__(
         self,

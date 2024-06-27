@@ -52,6 +52,7 @@ class DrawTextLike(Protocol):
         s: str,
         col: int,
         layout: Optional[LayoutOpts] = ...,
+        target: Optional[pyxel.Image] = ...,
         /,
     ) -> None:
         ...
@@ -101,6 +102,7 @@ class Font:
         dithering_cols: Optional[List[int]] = None,
         threshold: Optional[int] = None,
         layout: Optional[LayoutOpts] = None,
+        target: Optional[pyxel.Image] = None,
     ):
         """
         Draws text onto the Pyxel screen at the specified location.
@@ -114,6 +116,7 @@ class Font:
             dithering_cols (Optional[List[int]]): A list of palette colors to use for dithering.
             threshold (Optional[int]): The threshold for dithering, ranges in 0-255.
             layout (Optional[LayoutOpts]): The layout options for the text.
+            target (Optional[pyxel.Image]): The target image to draw the text on. Defaults to the screen.
         """
         rasterized = self._rasterize(s, font_size, layout=layout)
         drawer = _state()
@@ -142,7 +145,8 @@ class Font:
             temp_buffer_arr[~np.isin(temp_buffer_arr, dithering_cols)] = reserved
         else:
             temp_buffer_arr[rasterized > threshold] = col
-        pyxel.blt(
+        target = target or pyxel
+        target.blt(
             x, y, temporary_buffer, 0, 0, *rasterized.shape[::-1], colkey=reserved
         )
 

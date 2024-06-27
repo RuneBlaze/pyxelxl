@@ -4,6 +4,7 @@ from .rotate import blt as blt_rot
 
 from typing import Literal, Optional
 
+
 def layout(
     w: Optional[int] = None,
     h: Optional[int] = None,
@@ -36,5 +37,6 @@ def layout(
         line_height_mult=line_height,
         can_break_words=break_words,
     )
+
 
 __all__ = ["Font", "LayoutOpts", "blt_rot", "layout"]
