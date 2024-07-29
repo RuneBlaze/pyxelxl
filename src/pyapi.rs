@@ -206,6 +206,36 @@ impl LayoutOpts {
     fn __str__(&self) -> String {
         self.__repr__()
     }
+
+    #[getter]
+    fn max_width(&self) -> Option<u32> {
+        self.max_width
+    }
+
+    #[getter]
+    fn max_height(&self) -> Option<u32> {
+        self.max_height
+    }
+
+    #[getter]
+    fn horizontal_align(&self) -> String {
+        self.horizontal_align.to_string()
+    }
+
+    #[getter]
+    fn vertical_align(&self) -> String {
+        self.vertical_align.to_string()
+    }
+
+    #[getter]
+    fn line_height_mult(&self) -> Option<f32> {
+        self.line_height_mult
+    }
+
+    #[getter]
+    fn can_break_words(&self) -> Option<bool> {
+        self.can_break_words
+    }
 }
 
 impl LayoutOpts {
